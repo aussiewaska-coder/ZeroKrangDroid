@@ -9,7 +9,7 @@
         "look up number"
       ],
       "type": "core",
-      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/caller-research.skill.json",
+      "path": "/home/user/ZeroKrangDroid/skills/core/caller-research.skill.json",
       "created": "2026-03-22T08:10:34.698Z"
     },
     {
@@ -22,7 +22,7 @@
         "get contact details"
       ],
       "type": "core",
-      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/contact-extraction.skill.json",
+      "path": "/home/user/ZeroKrangDroid/skills/core/contact-extraction.skill.json",
       "created": "2026-03-22T08:10:34.698Z"
     },
     {
@@ -38,7 +38,7 @@
         "coolangatta"
       ],
       "type": "core",
-      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/gold-coast-intelligence.skill.json",
+      "path": "/home/user/ZeroKrangDroid/skills/core/gold-coast-intelligence.skill.json",
       "created": "2026-03-22T08:10:34.698Z"
     },
     {
@@ -51,7 +51,7 @@
         "automotive repair lead"
       ],
       "type": "core",
-      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/tug-lead-research.skill.json",
+      "path": "/home/user/ZeroKrangDroid/skills/core/tug-lead-research.skill.json",
       "created": "2026-03-22T08:10:34.698Z"
     },
     {
@@ -65,9 +65,9 @@
         "learn about"
       ],
       "type": "core",
-      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/web-research.skill.json",
+      "path": "/home/user/ZeroKrangDroid/skills/core/web-research.skill.json",
       "created": "2026-03-22T08:10:34.697Z"
     }
   ],
-  "updated": "2026-03-22T12:00:00.000Z"
+  "updated": "2026-03-22T21:24:23.548Z"
 }
