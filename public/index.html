@@ -100,7 +100,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 :root.dark .tt-sun{transform:translateY(20px);opacity:0;}
 
 /* ══ SIDEBAR NAV ══ */
-.hamburger{font-size:16px!important;}
+.hamburger{font-size:16px!important;min-width:44px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:rgba(245,166,35,.2);}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;opacity:0;pointer-events:none;transition:opacity .25s;}
 .sidebar-overlay.show{opacity:1;pointer-events:all;}
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);border-right:1px solid var(--border);z-index:901;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 32px rgba(0,0,0,.3);backdrop-filter:blur(12px);}
@@ -110,7 +110,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .sb-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;padding:6px;border-radius:var(--r);}
 .sb-close:hover{color:var(--text);}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto;}
-.sb-item{display:flex;align-items:center;gap:13px;padding:13px 18px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;position:relative;}
+.sb-item{display:flex;align-items:center;gap:13px;padding:13px 18px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;position:relative;touch-action:manipulation;}
 .sb-item:hover{background:var(--bg3);}
 .sb-item:hover > i{color:var(--amber);transform:scale(1.15);filter:drop-shadow(0 0 4px var(--amber-glow));}
 .sb-item.active{border-left-color:var(--amber);background:linear-gradient(90deg,var(--amber-glow) 0%,transparent 100%);}
@@ -1860,6 +1860,23 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Restore saved server URL
   const saved=localStorage.getItem('zk_server');
   if(saved)document.getElementById('c-srv').value=saved;
+
+  // Hamburger menu — direct listener as failsafe
+  document.getElementById('hamburger').addEventListener('click',function(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click',function(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+  // Sidebar nav items
+  document.querySelectorAll('.sb-item').forEach(function(item){
+    item.addEventListener('click',function(){
+      var n=this.id.replace('si-','');
+      go(n);
+    });
+  });
 });
 </script>
 <script>
@@ -1876,10 +1893,10 @@ function wgo(n){
 }
 
 // ── CHAT ───────────────────────────────────────
-let brain='claude',demoIdx=0,micOn=false;
+brain='claude'; var demoIdx=0; micOn=false;
 const RESPS=["Battery at **78%** and charging. No missed calls this morning.","Found **2 memories** about that — Dave from Robina re: 3pm tomorrow, TUG franchisee note.","Done. SMS sent to +61 4 1234 5678 — *'Running 20 mins behind, see you soon'*.","Launched Termux. Screen on.","Gold Coast today: **28°C, partly cloudy**. No rain expected.","Stored: `preference · direct comms, no filler, Gold Coast timezone`","**SM-N986B** · Android 13 · 78% charging · 4.1 GB free · 196 GB storage.","Found **3 results** for that search. Top result: touchupguys.com.au — extracting contacts now..."];
 const TOOLS=[[{n:'memory_recall',a:'"recent context"',r:'2 results'}],[{n:'adb',a:'dumpsys battery',r:'78%'}],[{n:'sms',a:'+61412345678',r:'delivered'}],[{n:'adb',a:'am start com.termux',r:'OK'}],[{n:'web_search',a:'Gold Coast weather',r:'28°C'}],[{n:'memory_store',a:'"preference · direct"',r:'stored'}],[{n:'adb',a:'getprop ro.product.model',r:'SM-N986B'}],[{n:'brave_search',a:'TUG franchisees AU',r:'8 results'}]];
-let lastTool=null;
+lastTool=null;
 
 function setBrain(m){brain=m;document.querySelectorAll('.bsb').forEach(b=>b.classList.remove('active'));document.getElementById('bm-'+m).classList.add('active');document.getElementById('bshint').innerHTML=m==='claude'?'<i class="fa-solid fa-circle-info" style="margin-right:2px"></i>Brain · Tools · Memory':'<i class="fa-solid fa-circle-info" style="margin-right:2px"></i>ZeroClaw bridge';setBadge('chat',m==='claude'?'CLAUDE':'ZEROCLAW');}
 function ck(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
@@ -1895,7 +1912,7 @@ function clearChat(){document.getElementById('msgs').innerHTML='';addMsg('a','Ch
 function toggleMic(){micOn=!micOn;document.getElementById('micbtn').classList.toggle('on',micOn);if(micOn){const p=['What did Dave from Robina call about?','Check device battery level','What\'s the weather today?','Find TUG leads on Gold Coast'];document.getElementById('ci').value=p[Math.floor(Math.random()*p.length)];ar(document.getElementById('ci'));setTimeout(()=>{micOn=false;document.getElementById('micbtn').classList.remove('on');},2000);}}
 
 // ── CALLS ───────────────────────────────────────
-let calls=[],callSecs=0,callInt=null;
+calls={}; callSecs=0; callInt=null;
 function dial(){const to=document.getElementById('di').value.trim();if(!to){toast('Enter a number','err');return;}addCall({sid:'CA'+Math.random().toString(36).slice(2,9),to,dir:'outbound',start:Date.now()});document.getElementById('di').value='';addTx('system','📲 Dialing '+to+'...');go('calls');setTimeout(()=>{addTx('system','🔗 Connected · Gemini Live · Claude brain');addTx('caller','👤  Hello?');setTimeout(()=>addTx('agent','🤖  Hey, ZeroKrang here — Chris\'s assistant. He\'s not available. How can I help?'),1100);},1600);}
 function addCall(c){calls.push(c);document.getElementById('ncalls').style.display='none';document.getElementById('txwrap').style.display='flex';document.getElementById('cdot').classList.add('live');document.getElementById('ctxt').innerHTML=`<strong>${calls.length}</strong> active call · Gemini Voice · Claude Brain`;const badge=document.getElementById('sbcbadge');badge.style.display='inline-block';badge.textContent=calls.length;setBadge('call','GEMINI LIVE');const cards=document.getElementById('ccards');const el=document.createElement('div');el.className='ccard';el.id='cc-'+c.sid;el.innerHTML=`<div class="cc-ava"><i class="fa-solid fa-user"></i></div><div class="cc-inf"><div class="cc-num">${c.to}</div><div class="cc-meta"><span>${c.dir}</span><span class="ctg ctg-g">GEMINI VOICE</span><span class="ctg ctg-a">CLAUDE BRAIN</span></div></div><button class="endbtn" onclick="endCall('${c.sid}')"><i class="fa-solid fa-phone-slash"></i> END</button>`;cards.appendChild(el);callSecs=0;clearInterval(callInt);callInt=setInterval(()=>{callSecs++;const m=String(Math.floor(callSecs/60)).padStart(2,'0'),s=String(callSecs%60).padStart(2,'0');document.getElementById('ctimer').textContent=m+':'+s;},1000);}
 function endCall(sid){calls=calls.filter(c=>c.sid!==sid);const el=document.getElementById('cc-'+sid);if(el)el.remove();clearInterval(callInt);document.getElementById('ctimer').textContent='';if(!calls.length){document.getElementById('cdot').classList.remove('live');document.getElementById('ctxt').textContent='No active calls';document.getElementById('sbcbadge').style.display='none';document.getElementById('ncalls').style.display='flex';document.getElementById('txwrap').style.display='none';setBadge('chat',brain==='zc'?'ZEROCLAW':'CLAUDE');}addTx('system',`📵 Ended · ${Math.floor(callSecs/60)}m ${callSecs%60}s`);toast('Call ended','ok');}
@@ -1904,7 +1921,7 @@ function addTx(r,t){const b=document.getElementById('txbody');const d=document.c
 setTimeout(()=>{if(!calls.length){const c={sid:'CA'+Math.random().toString(36).slice(2,9),to:'+61 4 1234 5678',dir:'inbound',start:Date.now()};addCall(c);addTx('system','📞 Incoming from +61 4 1234 5678');addTx('agent','🤖  Hey, ZeroKrang. Chris isn\'t available — can I help?');setTimeout(()=>addTx('caller','👤  Just confirming the 3pm tomorrow.'),1200);setTimeout(()=>addTx('agent','🤖  Got it, I\'ll pass that on. Anything else?'),2500);setTimeout(()=>addTx('caller','👤  No that\'s all, cheers.'),3700);setTimeout(()=>addTx('agent','🤖  No worries. Have a good one.'),4700);toast('📞 Incoming from +61 4 1234 5678','ok');go('calls');}},9000);
 
 // ── WEB — SEARCH ──────────────────────────────
-let srchPv='brave';
+srchPv='brave';
 function setPv(p){srchPv=p;document.querySelectorAll('.pvbtn').forEach(b=>b.classList.remove('active'));document.getElementById('pv-'+p).classList.add('active');}
 const DEMO_RESULTS={
   default:[
@@ -1939,7 +1956,7 @@ function runSearch(){
 }
 
 // ── WEB — PREVIEW ─────────────────────────────
-let prevHistory=[],prevIdx=-1;
+var prevHistory=[],prevIdx=-1;
 function loadPreview(url){
   if(!url){url=document.getElementById('prevUrl').value.trim();if(!url)return;}
   document.getElementById('prevUrl').value=url;
@@ -1981,7 +1998,7 @@ function buildSimPage(url){
   </div></body></html>`;}
 
 // ── WEB — JOBS ────────────────────────────────
-let jobs=[],collectedData=[],currentSchema=null,jobRunning=false;
+var jobs=[]; collectedData=[]; var currentSchema=null,jobRunning=false;
 function collectFrom(url){document.getElementById('jbQuery').value=url;document.getElementById('jbTable').value='contacts';document.getElementById('jbFields').value='name, email, phone, address, website';wgo('jobs');}
 function createJob(){
   const q=document.getElementById('jbQuery').value.trim();
@@ -2100,7 +2117,7 @@ function pushSupa(){
 }
 
 // ── ADB ───────────────────────────────────────
-let th=[],ti=-1;
+th=[]; ti=-1;
 function populateDev(){const d={'sv-status':{v:'CONNECTED',c:'ok'},'sv-batt':{v:'78% · ⚡',c:'ok'},'sv-model':{v:'Note20 Ultra',c:''},'sv-android':{v:'Android 13',c:''},'sv-screen':{v:'1080×2268',c:''},'sv-mem':{v:'4.1 GB free',c:''},'sv-storage':{v:'196 GB free',c:''},'sv-temp':{v:'32.1°C',c:'warn'}};for(const[id,s]of Object.entries(d)){const el=document.getElementById(id);if(el){el.textContent=s.v;el.className='svv'+(s.c?' '+s.c:'');}}document.getElementById('adbTitle').textContent='SM-N986B';}
 function refreshDev(){document.getElementById('sv-status').textContent='REFRESHING…';document.getElementById('sv-status').className='svv warn';setTimeout(()=>{populateDev();toast('Device refreshed','ok');},700);}
 function akey(k,l){tlog('cmd','input keyevent '+k);tlog('out','');toast(l,'ok');}
@@ -2121,7 +2138,7 @@ function setMode2(m){['chat','call','cmd'].forEach(x=>{const b=document.getEleme
 function refStatus(){toast('Refreshing...','ok');setTimeout(()=>{document.getElementById('si-tunnel').className='si ok';document.getElementById('sv-tunnel').textContent='abc123.ngrok.io';toast('Status refreshed','ok');},700);}
 
 // ── GITHUB ─────────────────────────────────────
-let ghConn=false,ghD=null;
+ghConn=false; ghD=null;
 function glLine(c,t){const el=document.getElementById('ghlog');el.style.display='block';const d=document.createElement('div');d.className='gl '+c;d.textContent=t;el.appendChild(d);el.scrollTop=el.scrollHeight;}
 function toggleGhLog(){const el=document.getElementById('ghlog');el.style.display=el.style.display==='none'||!el.style.display?'block':'none';}
 function ghConnect(){const t=document.getElementById('gh-t').value.trim(),r=document.getElementById('gh-r').value.trim(),b=document.getElementById('gh-b').value.trim()||'main';if(!t||!r){toast('Enter token + repo','err');return;}document.getElementById('ghcb').innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';document.getElementById('ghd').className='ghd warn';fetch(`https://api.github.com/repos/${r}/branches/${b}`,{headers:{Authorization:`Bearer ${t}`,'Accept':'application/vnd.github+json'}}).then(res=>{if(!res.ok)throw new Error('HTTP '+res.status);return res.json();}).then(data=>{ghConn=true;ghD={t,r,b,sha:data.commit.sha};['ghpb','ghpullb','ghstsb'].forEach(id=>document.getElementById(id).disabled=false);document.getElementById('ghd').className='ghd on';document.getElementById('ghrn').textContent=r;document.getElementById('ghss').textContent='connected';const bb=document.getElementById('ghbb');bb.style.display='flex';document.getElementById('ghbl').textContent=b;document.getElementById('ghlr').style.display='flex';document.getElementById('ghlm').textContent=data.commit.commit.message.slice(0,50);document.getElementById('ghlh').textContent=data.commit.sha.slice(0,7);document.getElementById('ghcb').innerHTML='<i class="fa-solid fa-check"></i> CONNECTED';document.getElementById('ghcb').style.color='var(--green)';document.getElementById('si-gh').className='si ok';document.getElementById('sv-gh').textContent=r;glLine('ok','✓ Connected → '+r+' · '+b);glLine('hash',data.commit.sha.slice(0,7)+'  '+data.commit.commit.message.slice(0,55));toast('Connected to '+r,'ok');}).catch(e=>{document.getElementById('ghd').className='ghd err';document.getElementById('ghcb').innerHTML='<i class="fa-brands fa-github"></i> CONNECT';glLine('err','✗ '+e.message);toast('GitHub: '+e.message,'err');});}
@@ -2136,7 +2153,7 @@ function setBadge(mode,brain){const b=document.getElementById('mbadge');b.classN
 // ── UTILS ──────────────────────────────────────
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function tUrl(url){try{const u=new URL(url);return u.hostname+u.pathname.slice(0,25);}catch{return url.slice(0,40);}}
-let _tt;
+_tt=undefined;
 function toast(msg,type=''){const t=document.getElementById('toastEl');const ic={ok:'fa-circle-check',err:'fa-circle-xmark','':'fa-circle-info'};t.innerHTML=`<i class="fa-solid ${ic[type]||ic['']}"></i>${msg}`;t.className='toast show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(()=>t.className='toast',2800);}
 
 // ── MAP (Leaflet) ─────────────────────────────
