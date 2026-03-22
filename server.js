@@ -35,19 +35,21 @@ const httpServer = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Kill caching — forces browser to always fetch fresh files
+// ABSOLUTE CACHE ANNIHILATION — nothing survives
 app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   res.set('Surrogate-Control', 'no-store');
+  res.set('Vary', '*');
+  res.set('X-ZK-Build', Date.now().toString());
   next();
 });
 
 // Force-refresh route — busts Chrome's aggressive cache
 app.get('/fresh', (req, res) => res.redirect(`/?v=${Date.now()}`));
 
-app.use(express.static(join(__dirname, 'public'), { etag: false, lastModified: false }));
+app.use(express.static(join(__dirname, 'public'), { etag: false, lastModified: false, maxAge: 0, immutable: false }));
 
 // ─────────────────────────────────────────────────
 // WEBSOCKET — UI clients
