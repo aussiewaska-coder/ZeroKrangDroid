@@ -44,6 +44,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Force-refresh route — busts Chrome's aggressive cache
+app.get('/fresh', (req, res) => res.redirect(`/?v=${Date.now()}`));
+
 app.use(express.static(join(__dirname, 'public'), { etag: false, lastModified: false }));
 
 // ─────────────────────────────────────────────────
