@@ -100,7 +100,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 :root.dark .tt-sun{transform:translateY(20px);opacity:0;}
 
 /* ══ SIDEBAR NAV ══ */
-.hamburger{font-size:16px!important;}
+.hamburger{font-size:16px!important;min-width:44px;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:rgba(245,166,35,.2);}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;opacity:0;pointer-events:none;transition:opacity .25s;}
 .sidebar-overlay.show{opacity:1;pointer-events:all;}
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:280px;background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);border-right:1px solid var(--border);z-index:901;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 32px rgba(0,0,0,.3);backdrop-filter:blur(12px);}
@@ -110,7 +110,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .sb-close{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;padding:6px;border-radius:var(--r);}
 .sb-close:hover{color:var(--text);}
 .sb-nav{flex:1;padding:8px 0;overflow-y:auto;}
-.sb-item{display:flex;align-items:center;gap:13px;padding:13px 18px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;position:relative;}
+.sb-item{display:flex;align-items:center;gap:13px;padding:13px 18px;cursor:pointer;border-left:3px solid transparent;transition:all .15s;position:relative;touch-action:manipulation;}
 .sb-item:hover{background:var(--bg3);}
 .sb-item:hover > i{color:var(--amber);transform:scale(1.15);filter:drop-shadow(0 0 4px var(--amber-glow));}
 .sb-item.active{border-left-color:var(--amber);background:linear-gradient(90deg,var(--amber-glow) 0%,transparent 100%);}
@@ -1860,6 +1860,23 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Restore saved server URL
   const saved=localStorage.getItem('zk_server');
   if(saved)document.getElementById('c-srv').value=saved;
+
+  // Hamburger menu — direct listener as failsafe
+  document.getElementById('hamburger').addEventListener('click',function(){
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+  });
+  document.getElementById('sidebarOverlay').addEventListener('click',function(){
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+  // Sidebar nav items
+  document.querySelectorAll('.sb-item').forEach(function(item){
+    item.addEventListener('click',function(){
+      var n=this.id.replace('si-','');
+      go(n);
+    });
+  });
 });
 </script>
 <script>
