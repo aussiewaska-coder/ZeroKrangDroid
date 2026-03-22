@@ -371,22 +371,47 @@ Same as Config → GitHub section. Dual implementation — both panels share the
 
 ```
 ZeroKrangDroid/
-├── server.js              # Entry point
+├── server.js              # Entry point (677 lines)
 ├── package.json           # express, ws, twilio, sql.js, cors, dotenv
 ├── .env                   # API keys (not in repo)
+├── SOUL.md                # ZeroKrang identity/purpose doc — loaded into every system prompt
+├── PERSONALITY.md         # Mode-specific behavioural rules — loaded into every system prompt
+├── TOOLS.md               # Available tools documentation — loaded into every system prompt
 ├── public/
 │   └── index.html         # Entire frontend (HTML + CSS + 2x JS blocks)
-└── modules/
-    ├── ai.js              # OpenRouter/Claude
-    ├── brain.js           # System prompt builder
-    ├── memory.js          # SQLite memory DB
-    ├── skills.js          # Skill registry
-    ├── calls.js           # Twilio voice + media streams
-    ├── adb.js             # Android Debug Bridge
-    ├── zeroclaw.js        # ZeroClaw bridge
-    ├── search.js          # Brave/SERP/DDG/Perplexity
-    ├── browse.js          # HTTP fetch + Playwright
-    ├── collector.js       # Multi-page data collector
-    ├── research.js        # Auto-research engine
-    └── tunnel.js          # ngrok tunnel
+├── modules/
+│   ├── ai.js              # OpenRouter/Claude + GeminiLiveSession class (223 lines)
+│   ├── brain.js           # System prompt builder, loadIdentity(), MODES (414 lines)
+│   ├── memory.js          # SQLite memory DB at ~/.zerokrang/memory.db (258 lines)
+│   ├── skills.js          # Skill registry (294 lines)
+│   ├── calls.js           # Twilio voice + Gemini Live media streams (175 lines)
+│   ├── adb.js             # Android Debug Bridge (125 lines)
+│   ├── zeroclaw.js        # ZeroClaw bridge at 127.0.0.1:42617 (96 lines)
+│   ├── search.js          # Brave/SERP/DDG/Perplexity (229 lines)
+│   ├── browse.js          # HTTP fetch + Playwright browser (339 lines)
+│   ├── collector.js       # Multi-page structured data collector (363 lines)
+│   ├── research.js        # Auto-research orchestration (284 lines)
+│   └── tunnel.js          # ngrok tunnel, polls localhost:4040/api/tunnels (54 lines)
+└── skills/
+    ├── index.json          # Skill registry index
+    └── core/
+        ├── web-research.skill.json
+        ├── caller-research.skill.json
+        ├── contact-extraction.skill.json
+        ├── gold-coast-intelligence.skill.json
+        └── tug-lead-research.skill.json
 ```
+
+### Memory DB
+- Path: `~/.zerokrang/memory.db` (configurable via `MEMORY_DB_PATH` env var)
+- Persisted to disk after every write
+
+### Skills
+- Core skills seeded by `Skills.init()` on boot
+- Learned skills saved to `skills/learned/` as `.skill.json` files
+- Agent can autonomously create new skills via `research` → `Skills.learn()`
+
+### Identity Docs (SOUL.md / PERSONALITY.md / TOOLS.md)
+- Loaded by `Brain.loadIdentity()` at boot
+- Prepended to every Claude system prompt
+- Edit these to change personality, mode behaviour, or tool docs
