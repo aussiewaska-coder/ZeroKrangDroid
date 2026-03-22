@@ -588,18 +588,40 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .panel{display:none;flex-direction:column;height:100%;overflow:hidden;animation:panelIn .25s ease;}
 .panel.active{display:flex;}
 @keyframes panelIn{from{opacity:0}to{opacity:1}}
+
+/* ══ MOBILE RESPONSIVE ══ */
+@media(max-width:768px){
+  .topbar{padding:0 8px;gap:4px;height:44px;}
+  .logo-text{font-size:11px;letter-spacing:2px;}
+  .logo-ver{display:none;}
+  .logo-ring{display:none;}
+  .logo-brain{font-size:18px;}
+  .mbadge{padding:2px 6px;font-size:7px;letter-spacing:1px;}
+  .mbadge #mb2{display:none;}
+  .ib{width:28px;height:28px;font-size:12px;}
+  .tbr{gap:2px;}
+  .sidebar{width:85vw;max-width:300px;}
+  .msgs{padding:10px 8px;}
+  .msg{max-width:92%;}
+  .bub{padding:8px 11px;font-size:13px;}
+  .chatbar{padding:6px 8px;}
+  .brain-sw{gap:3px;margin-bottom:5px;}
+  .bsb{padding:3px 8px;font-size:8px;}
+  .bshint{display:none;}
+  .irow{gap:4px;}
+  #ci{padding:7px 10px;font-size:13px;}
+  .acbtn,.sndbtn{width:36px;height:36px;}
+  .tp-arg{max-width:80px;}
+  .tool-pill{font-size:10px;padding:4px 8px;}
+  .panel{overflow-y:auto;}
+  .gh-fab{bottom:60px;right:8px;width:40px;height:40px;font-size:16px;}
+}
 </style>
 </head>
 <body>
 
 <!-- BOOT SPLASH -->
-<div class="splash" id="splash">
-  <div class="splash-brain">🧠</div>
-  <div class="splash-title">ZEROKRANG</div>
-  <div class="splash-sub">PERSONAL AI AGENT · GOLD COAST</div>
-  <div class="splash-git" id="splashGit">loading build...</div>
-  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-</div>
+<!-- splash removed -->
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -1147,7 +1169,7 @@ function connect() {
 }
 
 function j(type, data={}) { return JSON.stringify({type, ...data}); }
-function send(type, data={}) { if(ws?.readyState===WebSocket.OPEN) ws.send(j(type, data)); }
+function wsSend(type, data={}) { if(ws?.readyState===WebSocket.OPEN) ws.send(j(type, data)); }
 
 // ── INCOMING MESSAGE HANDLER ───────────────────
 let currentChatEl = null;
@@ -1339,7 +1361,7 @@ function onMsg(msg) {
     case 'call_ended':
       uiCallEnded(msg.callSid);
       // Trigger post-call research
-      if(msg.from) send('research_caller', { from: msg.from, summary: msg.summary||'' });
+      if(msg.from) wsSend('research_caller', { from: msg.from, summary: msg.summary||'' });
       break;
 
     case 'call_transcript':
@@ -1441,8 +1463,8 @@ function go(n) {
   // Close sidebar
   closeSidebar();
   // Panel-specific actions
-  if(n==='adb') send('adb_device_info');
-  if(n==='config') send('system_status');
+  if(n==='adb') wsSend('adb_device_info');
+  if(n==='config') wsSend('system_status');
   if(n==='map') setTimeout(()=>{ if(!map) initMap(); else map.invalidateSize(); }, 150);
   if(n==='status') refreshHealth();
 }
@@ -1472,8 +1494,8 @@ function sendMsg() {
   const text = inp.value.trim(); if(!text) return;
   inp.value=''; inp.style.height='auto';
   addMsg('u', text);
-  if(brain==='claude') send('chat', {text, useClaude:true});
-  else send('chat', {text, useClaude:false});
+  if(brain==='claude') wsSend('chat', {text, useClaude:true});
+  else wsSend('chat', {text, useClaude:false});
 }
 
 function addMsg(role, text, btag) {
@@ -1513,7 +1535,7 @@ function doneTool(r) {
 
 function scrollMsgs() { const m=document.getElementById('msgs'); m.scrollTop=m.scrollHeight; }
 function ar(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
-function clearChat() { send('chat_clear'); }
+function clearChat() { wsSend('chat_clear'); }
 
 // Mic — uses Web Speech API, sends text via WS
 let micOn=false, recog=null;
@@ -1535,7 +1557,7 @@ let calls={}, callSecs=0, callInt=null;
 function dial() {
   const to=document.getElementById('di').value.trim();
   if(!to){toast('Enter a number','err');return;}
-  send('call_make',{to});
+  wsSend('call_make',{to});
   document.getElementById('di').value='';
   go('calls');
 }
@@ -1573,7 +1595,7 @@ function uiCallEnded(sid) {
   toast('Call ended','ok');
 }
 
-function endCall(sid) { send('call_hangup',{callSid:sid}); }
+function endCall(sid) { wsSend('call_hangup',{callSid:sid}); }
 
 function addTxLine(r,t) {
   const b=document.getElementById('txbody');
@@ -1597,8 +1619,8 @@ function runSearch() {
   const q=document.getElementById('srchInput').value.trim();
   if(!q){toast('Enter a search query','err');return;}
   document.getElementById('srchResults').innerHTML='<div class="srch-empty"><i class="fa-solid fa-spinner fa-spin" style="opacity:.5"></i><span>Searching via '+srchPv.toUpperCase()+'...</span></div>';
-  if(srchPv==='perplexity') send('perplexity_ask',{query:q});
-  else send('web_search',{query:q,provider:srchPv});
+  if(srchPv==='perplexity') wsSend('perplexity_ask',{query:q});
+  else wsSend('web_search',{query:q,provider:srchPv});
 }
 
 function renderSearchResults(results, query) {
@@ -1631,7 +1653,7 @@ function loadPreview(urlEnc) {
   document.getElementById('prevIdle').style.display='none';
   document.getElementById('prevIframe').style.display='none';
   updatePreviewOverlay(url,'Fetching...');
-  send('web_fetch',{url});
+  wsSend('web_fetch',{url});
 }
 
 function updatePreviewOverlay(url, action) {
@@ -1711,7 +1733,7 @@ function createJob() {
   plog('nav',`<i class="fa-solid fa-spider"></i> Job: ${q}`);
   plog('nav',`<i class="fa-solid fa-table"></i> Table: ${tbl} · Fields: ${Object.keys(fields).join(', ')}`);
   wgo('preview');
-  send('collector_run',{topic:q,target:q,is_url:q.startsWith('http'),table:tbl,fields,follow_links:true,max_pages:5});
+  wsSend('collector_run',{topic:q,target:q,is_url:q.startsWith('http'),table:tbl,fields,follow_links:true,max_pages:5});
 }
 
 function renderExtracted(result) {
@@ -1753,15 +1775,15 @@ function pushSupa() {
   if(!collectedData.length){toast('No data','err');return;}
   document.getElementById('pushBtn').innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> PUSHING...';
   plog('push',`<i class="fa-solid fa-cloud-arrow-up"></i> Pushing ${collectedData.length} rows → ${currentTable}`);
-  send('collector_push',{table:currentTable,rows:collectedData});
+  wsSend('collector_push',{table:currentTable,rows:collectedData});
   setTimeout(()=>{document.getElementById('pushBtn').innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> SUPABASE';},3000);
 }
 
 // ── ADB ───────────────────────────────────────
 let th=[], ti=-1;
 
-function populateDev(){send('adb_device_info');}
-function refreshDev(){send('adb_device_info');toast('Refreshing...','ok');}
+function populateDev(){wsSend('adb_device_info');}
+function refreshDev(){wsSend('adb_device_info');toast('Refreshing...','ok');}
 
 function renderDevInfo(info){
   if(!info)return;
@@ -1778,21 +1800,21 @@ function renderDevInfo(info){
   document.getElementById('adbTitle').textContent=info.model||'DEVICE';
 }
 
-function akey(k,l){send('adb_key',{keycode:k});toast(l,'ok');}
-function aswipe(d){send('adb_swipe',d==='up'?{x1:540,y1:1600,x2:540,y2:400}:{x1:540,y1:400,x2:540,y2:1600});toast('Swipe '+d,'ok');}
-function atap(){send('adb_tap',{x:parseInt(document.getElementById('tx').value)||540,y:parseInt(document.getElementById('ty').value)||960});toast('Tap sent','ok');}
-function alistApps(){send('adb_list_apps');}
-function doShot(){send('adb_screenshot');}
+function akey(k,l){wsSend('adb_key',{keycode:k});toast(l,'ok');}
+function aswipe(d){wsSend('adb_swipe',d==='up'?{x1:540,y1:1600,x2:540,y2:400}:{x1:540,y1:400,x2:540,y2:1600});toast('Swipe '+d,'ok');}
+function atap(){wsSend('adb_tap',{x:parseInt(document.getElementById('tx').value)||540,y:parseInt(document.getElementById('ty').value)||960});toast('Tap sent','ok');}
+function alistApps(){wsSend('adb_list_apps');}
+function doShot(){wsSend('adb_screenshot');}
 function tlog(t,txt){const o=document.getElementById('tout');const d=document.createElement('div');d.className='t2 '+t;d.textContent=txt;o.appendChild(d);o.scrollTop=o.scrollHeight;}
 function clearTerm(){document.getElementById('tout').innerHTML='';tlog('info','// cleared');}
 function tk(e){if(e.key==='Enter'){e.preventDefault();rterm();return;}if(e.key==='ArrowUp'){e.preventDefault();if(ti<th.length-1){ti++;e.target.value=th[th.length-1-ti];}}if(e.key==='ArrowDown'){e.preventDefault();if(ti>0){ti--;e.target.value=th[th.length-1-ti];}else{ti=-1;e.target.value='';}}}
-function rterm(){const inp=document.getElementById('ti');const cmd=inp.value.trim();if(!cmd)return;th.push(cmd);ti=-1;inp.value='';send('adb_shell',{command:cmd});}
+function rterm(){const inp=document.getElementById('ti');const cmd=inp.value.trim();if(!cmd)return;th.push(cmd);ti=-1;inp.value='';wsSend('adb_shell',{command:cmd});}
 
 // ── CONFIG ─────────────────────────────────────
-function doPair(){const c=document.getElementById('c-pc').value.trim();if(!c||c.length<6){toast('Enter 6-digit code','err');return;}send('zc_pair',{code:c});}
+function doPair(){const c=document.getElementById('c-pc').value.trim();if(!c||c.length<6){toast('Enter 6-digit code','err');return;}wsSend('zc_pair',{code:c});}
 function saveKeys(){const or=document.getElementById('c-or').value.trim();if(or){document.getElementById('si-claude').className='si ok';document.getElementById('sv-claude').textContent='sonnet-4.6';}toast('Keys saved — restart server to apply','ok');}
 function setMode2(m){['chat','call','cmd'].forEach(x=>{const b=document.getElementById('cfg-'+x);if(b){b.style.borderColor='';b.style.color='';}});const c={chat:'var(--amber)',call:'var(--green)',cmd:'var(--purple)'};const b=document.getElementById('cfg-'+m);if(b){b.style.borderColor=c[m];b.style.color=c[m];}setBadge(m);toast('Mode: '+m.toUpperCase(),'ok');}
-function refStatus(){send('system_status');toast('Refreshed','ok');}
+function refStatus(){wsSend('system_status');toast('Refreshed','ok');}
 function renderMemStats(s){if(!s)return;document.getElementById('sv-zc').textContent=`Paired · ${s.episodic}ep ${s.semantic}sem`;}
 function renderSkillsList(skills){if(!skills)return;document.getElementById('sv-gemini').textContent=`${skills.length} skills`;}
 
@@ -2326,9 +2348,9 @@ function refreshHealth() {
     });
 
   // Always request via WS too
-  send('system_status');
-  send('memory_stats');
-  send('skills_list');
+  wsSend('system_status');
+  wsSend('memory_stats');
+  wsSend('skills_list');
 }
 
 function updateHealthTiles(data) {
@@ -2409,17 +2431,17 @@ function healthAction(action) {
     case 'restart':
       toast('Restarting...', 'ok');
       addHealthLog('warn', 'Restart requested...');
-      send('system_restart');
+      wsSend('system_restart');
       setTimeout(refreshHealth, 3000);
       break;
     case 'compact':
       toast('Compacting memory...', 'ok');
       addHealthLog('info', 'Memory compaction started');
-      send('memory_compact');
+      wsSend('memory_compact');
       break;
     case 'clearmem':
       if(confirm('Wipe ALL memory? This cannot be undone.')) {
-        send('chat_clear');
+        wsSend('chat_clear');
         addHealthLog('warn', 'Memory cleared');
         toast('Memory wiped', 'ok');
       }
@@ -2478,7 +2500,7 @@ function ghFabPush(){
   const msg=document.getElementById('ghFabCommitMsg').value.trim()||`ZeroKrang: update from device ${new Date().toLocaleString('en-AU',{timeZone:'Australia/Brisbane'})}`;
   document.getElementById('ghFabLog').innerHTML='';
   ghFabLog('ok','↑ Pushing to '+ghFabData.b+'...');
-  if(isConnected)send('git_push',{message:msg,token:ghFabData.t,repo:ghFabData.r,branch:ghFabData.b});
+  if(isConnected)wsSend('git_push',{message:msg,token:ghFabData.t,repo:ghFabData.r,branch:ghFabData.b});
   else setTimeout(()=>{const h=Math.random().toString(36).slice(2,9);document.getElementById('ghFabMsg').textContent=msg.slice(0,50);document.getElementById('ghFabHash').textContent=h;ghFabLog('ok','↑ '+h+'  '+msg.slice(0,45));toast('Pushed','ok');},1200);
 }
 function ghFabPull(){
@@ -2491,7 +2513,7 @@ function ghFabPull(){
       const behind=data.commit.sha!==ghFabData.sha;
       document.getElementById('ghFabMsg').textContent=data.commit.commit.message.slice(0,50);
       document.getElementById('ghFabHash').textContent=data.commit.sha.slice(0,7);
-      if(behind){ghFabData.sha=data.commit.sha;ghFabLog('ok','↓ '+data.commit.sha.slice(0,7)+'  pulled');toast('Pulled — restart to apply','ok');if(isConnected)send('git_pull',{token:ghFabData.t,repo:ghFabData.r,branch:ghFabData.b});}
+      if(behind){ghFabData.sha=data.commit.sha;ghFabLog('ok','↓ '+data.commit.sha.slice(0,7)+'  pulled');toast('Pulled — restart to apply','ok');if(isConnected)wsSend('git_pull',{token:ghFabData.t,repo:ghFabData.r,branch:ghFabData.b});}
       else{ghFabLog('hash','· up to date');toast('Up to date','ok');}
     }).catch(e=>{ghFabLog('err','✗ '+e.message);toast('Pull failed','err');});
 }
@@ -2516,12 +2538,14 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(el) el.textContent='build info unavailable';
   });
 
-  // Splash screen
-  setTimeout(()=>{
+  // Splash screen — kill it no matter what
+  function killSplash(){
     const splash=document.getElementById('splash');
-    if(splash)splash.classList.add('gone');
-    setTimeout(()=>{if(splash)splash.remove();},700);
-  },2200);
+    if(splash){splash.classList.add('gone');setTimeout(()=>{if(splash)splash.remove();},700);}
+  }
+  setTimeout(killSplash,2200);
+  // Backup: if DOMContentLoaded already fired, kill it now
+  if(document.readyState!=='loading') setTimeout(killSplash,500);
 
   addMsg('a','Online. Gemini Live ready for calls. Claude ready for chat. Memory connected.\n\nWhat do you need?');
   tlog('info','// ZeroKrang v3.2 · SM-N986B · arm64 · Android 13');
