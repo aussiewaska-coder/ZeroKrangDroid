@@ -593,13 +593,14 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 <body>
 
 <!-- BOOT SPLASH -->
-<div class="splash" id="splash">
+<div class="splash" id="splash" style="animation:splashDie 0.6s ease 3s forwards;">
   <div class="splash-brain">🧠</div>
   <div class="splash-title">ZEROKRANG</div>
   <div class="splash-sub">PERSONAL AI AGENT · GOLD COAST</div>
   <div class="splash-git" id="splashGit">loading build...</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
+<style>@keyframes splashDie{to{opacity:0;visibility:hidden;pointer-events:none;}}</style>
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -2516,12 +2517,14 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(el) el.textContent='build info unavailable';
   });
 
-  // Splash screen
-  setTimeout(()=>{
+  // Splash screen — kill it no matter what
+  function killSplash(){
     const splash=document.getElementById('splash');
-    if(splash)splash.classList.add('gone');
-    setTimeout(()=>{if(splash)splash.remove();},700);
-  },2200);
+    if(splash){splash.classList.add('gone');setTimeout(()=>{if(splash)splash.remove();},700);}
+  }
+  setTimeout(killSplash,2200);
+  // Backup: if DOMContentLoaded already fired, kill it now
+  if(document.readyState!=='loading') setTimeout(killSplash,500);
 
   addMsg('a','Online. Gemini Live ready for calls. Claude ready for chat. Memory connected.\n\nWhat do you need?');
   tlog('info','// ZeroKrang v3.2 · SM-N986B · arm64 · Android 13');
