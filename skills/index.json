@@ -1,0 +1,73 @@
+{
+  "skills": [
+    {
+      "name": "caller-research",
+      "description": "Research a phone number or person after a call",
+      "triggers": [
+        "who called",
+        "research caller",
+        "look up number"
+      ],
+      "type": "core",
+      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/caller-research.skill.json",
+      "created": "2026-03-22T08:10:34.698Z"
+    },
+    {
+      "name": "contact-extraction",
+      "description": "Extract contacts from any website",
+      "triggers": [
+        "find contacts",
+        "extract emails",
+        "find phone numbers",
+        "get contact details"
+      ],
+      "type": "core",
+      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/contact-extraction.skill.json",
+      "created": "2026-03-22T08:10:34.698Z"
+    },
+    {
+      "name": "gold-coast-intelligence",
+      "description": "Research Gold Coast local business, property, and events",
+      "triggers": [
+        "gold coast",
+        "GC",
+        "robina",
+        "surfers",
+        "broadbeach",
+        "southport",
+        "coolangatta"
+      ],
+      "type": "core",
+      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/gold-coast-intelligence.skill.json",
+      "created": "2026-03-22T08:10:34.698Z"
+    },
+    {
+      "name": "tug-lead-research",
+      "description": "Research potential Touch Up Guys franchise leads",
+      "triggers": [
+        "tug lead",
+        "franchise lead",
+        "touch up guys",
+        "automotive repair lead"
+      ],
+      "type": "core",
+      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/tug-lead-research.skill.json",
+      "created": "2026-03-22T08:10:34.698Z"
+    },
+    {
+      "name": "web-research",
+      "description": "Deep research on any topic using search + browse + summarise",
+      "triggers": [
+        "research",
+        "find out about",
+        "look up",
+        "investigate",
+        "learn about"
+      ],
+      "type": "core",
+      "path": "/data/data/com.termux/files/home/zerokrang/skills/core/web-research.skill.json",
+      "created": "2026-03-22T08:10:34.697Z"
+    }
+  ],
+  "updated": "2026-03-22T08:10:34.883Z"
+}
