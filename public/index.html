@@ -50,6 +50,10 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 .splash-brain{font-size:48px;animation:splashPulse 1.5s ease infinite;}
 .splash-title{font-family:var(--display);font-size:22px;font-weight:900;color:var(--amber);letter-spacing:6px;text-shadow:0 0 30px var(--amber-glow),0 0 60px rgba(245,166,35,.15);}
 .splash-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);animation:fadeInUp .8s ease .3s both;}
+.splash-git{font-family:var(--font);font-size:9px;color:var(--green);letter-spacing:1px;opacity:0;animation:fadeInUp .5s ease .6s both;text-align:center;line-height:1.6;}
+.splash-git .sg-branch{color:var(--amber);font-weight:700;}
+.splash-git .sg-hash{color:var(--green);font-family:var(--mono,monospace);}
+.splash-git .sg-msg{color:var(--text-dim);font-style:italic;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;}
 .splash-bar{width:180px;height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:8px;}
 .splash-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--green));border-radius:1px;animation:splashLoad 1.8s ease-out forwards;}
 @keyframes splashPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px var(--amber-glow))}50%{transform:scale(1.08);filter:drop-shadow(0 0 20px rgba(245,166,35,.35))}}
@@ -583,6 +587,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
   <div class="splash-brain">🧠</div>
   <div class="splash-title">ZEROKRANG</div>
   <div class="splash-sub">PERSONAL AI AGENT · GOLD COAST</div>
+  <div class="splash-git" id="splashGit">loading build...</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
 
@@ -2492,6 +2497,15 @@ setTimeout(()=>{const t=localStorage.getItem('gh_token'),r=localStorage.getItem(
 
 // ── BOOT ───────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
+  // Fetch git info for splash
+  fetch('/api/git').then(r=>r.json()).then(g=>{
+    const el=document.getElementById('splashGit');
+    if(el) el.innerHTML=`<span class="sg-branch">${g.branch}</span> · <span class="sg-hash">${g.commit}</span><br><span class="sg-msg">${g.msg}</span>`;
+  }).catch(()=>{
+    const el=document.getElementById('splashGit');
+    if(el) el.textContent='build info unavailable';
+  });
+
   // Splash screen
   setTimeout(()=>{
     const splash=document.getElementById('splash');

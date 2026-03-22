@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
+import { execSync } from 'child_process';
 
 // Core
 import * as AI       from './modules/ai.js';
@@ -592,6 +593,16 @@ app.post('/api/adb', async (req, res) => {
 app.post('/api/research', async (req, res) => {
   const result = await Research.research(req.body.topic, { depth: req.body.depth || 'standard' });
   res.json(result);
+});
+
+app.get('/api/git', (req, res) => {
+  try {
+    const commit = execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim();
+    const branch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: __dirname }).toString().trim();
+    const msg = execSync('git log -1 --pretty=%s', { cwd: __dirname }).toString().trim();
+    const date = execSync('git log -1 --pretty=%ci', { cwd: __dirname }).toString().trim();
+    res.json({ commit, branch, msg, date });
+  } catch (e) { res.json({ commit: 'unknown', branch: 'unknown', msg: '', date: '' }); }
 });
 
 app.get('/api/memory/stats', (req, res) => res.json(Memory.stats()));
