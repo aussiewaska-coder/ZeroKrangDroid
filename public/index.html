@@ -1840,7 +1840,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(saved)document.getElementById('c-srv').value=saved;
 });
 </script>
-
+<script>
 // ── THEME ──────────────────────────────────────
 (function(){if(localStorage.getItem('zk_theme')==='dark')document.documentElement.classList.add('dark');})();
 function toggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.setItem('zk_theme',d?'dark':'light');toast(d?'Dark mode':'Light mode','ok');}
