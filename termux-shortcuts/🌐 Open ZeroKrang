@@ -1,0 +1,20 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Open ZeroKrang in browser (start server first if not running)
+cd ~/ZeroKrangDroid
+
+# Check if server is up
+if curl -s --max-time 2 http://localhost:3001 > /dev/null 2>&1; then
+  am start -a android.intent.action.VIEW -d "http://localhost:3001" 2>/dev/null || \
+    termux-open-url "http://localhost:3001"
+else
+  # Server not running — start it then open
+  termux-notification --title "ZeroKrang" --content "Starting server..." --id 1003 2>/dev/null
+  if command -v pm2 &>/dev/null; then
+    pm2 start server.js --name zerokrang 2>/dev/null || pm2 restart zerokrang
+  else
+    nohup node server.js > ~/zk.log 2>&1 &
+  fi
+  sleep 3
+  am start -a android.intent.action.VIEW -d "http://localhost:3001" 2>/dev/null || \
+    termux-open-url "http://localhost:3001"
+fi

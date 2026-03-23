@@ -1,0 +1,25 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Pull latest from GitHub and restart server
+cd ~/ZeroKrangDroid
+
+termux-notification --title "ZeroKrang" --content "Pulling from GitHub..." --id 1002 2>/dev/null
+
+git pull origin master 2>&1
+STATUS=$?
+
+if [ $STATUS -eq 0 ]; then
+  termux-notification --title "ZeroKrang" --content "✓ Up to date — restarting server" --id 1002 2>/dev/null
+  # Restart server
+  if command -v pm2 &>/dev/null; then
+    pm2 restart zerokrang 2>/dev/null
+  else
+    pkill -f "node server.js" 2>/dev/null
+    sleep 1
+    nohup node server.js > ~/zk.log 2>&1 &
+  fi
+  sleep 2
+  am start -a android.intent.action.VIEW -d "http://localhost:3001" 2>/dev/null || \
+    termux-open-url "http://localhost:3001"
+else
+  termux-notification --title "ZeroKrang" --content "Pull failed — check git config" --id 1002 2>/dev/null
+fi

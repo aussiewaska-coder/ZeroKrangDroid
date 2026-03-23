@@ -1,0 +1,17 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# Start ZeroKrang server with pm2 (or node if pm2 not available)
+cd ~/ZeroKrangDroid
+
+if command -v pm2 &>/dev/null; then
+  pm2 describe zerokrang &>/dev/null && pm2 restart zerokrang || pm2 start server.js --name zerokrang
+  termux-notification --title "ZeroKrang" --content "Server started via pm2" --id 1001 2>/dev/null
+else
+  pkill -f "node server.js" 2>/dev/null
+  nohup node server.js > ~/zk.log 2>&1 &
+  termux-notification --title "ZeroKrang" --content "Server started (pid $!)" --id 1001 2>/dev/null
+fi
+
+# Open in browser after short delay
+sleep 2
+am start -a android.intent.action.VIEW -d "http://localhost:3001" 2>/dev/null || \
+  termux-open-url "http://localhost:3001"
