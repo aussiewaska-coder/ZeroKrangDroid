@@ -644,7 +644,7 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
       <i class="fa-solid fa-moon tt-moon"></i>
     </button>
     <button class="ib" onclick="doShot()" title="Screenshot"><i class="fa-solid fa-camera"></i></button>
-    <button class="ib hamburger" id="hamburger" onclick="toggleSidebar()" title="Menu">
+    <button class="ib hamburger" id="hamburger" title="Menu">
       <i class="fa-solid fa-bars"></i>
     </button>
   </div>
@@ -1132,12 +1132,12 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 marked.setOptions({breaks:true,gfm:true,highlight:(c,l)=>l&&hljs.getLanguage(l)?hljs.highlight(c,{language:l}).value:hljs.highlightAuto(c).value});
 
 // ── THEME ──────────────────────────────────────
-(function(){if(localStorage.getItem('zk_theme')==='dark')document.documentElement.classList.add('dark');})();
+(function(){if(localStorage.getItem('zk_theme')!=='light')document.documentElement.classList.add('dark');})();
 function toggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.setItem('zk_theme',d?'dark':'light');toast(d?'Dark mode':'Light mode','ok');}
 
 // ── WS CONNECTION ──────────────────────────────
 const WS_URL = localStorage.getItem('zk_server') || `ws://${location.hostname}:3001/ws`;
-let ws = null, reconnectTimer = null, isConnected = false;
+let ws = null, reconnectTimer = null, isConnected = false, wsEverConnected = false;
 
 function connect() {
   ws = new WebSocket(WS_URL);
@@ -1150,7 +1150,7 @@ function connect() {
     setHTile('server','ok','Connected');
     addHealthLog('ok', 'WebSocket connected');
     ws.send(j('system_status'));
-    toast('Connected', 'ok');
+    if(!wsEverConnected){toast('Connected','ok');wsEverConnected=true;}
   };
   ws.onclose = () => {
     isConnected = false;
