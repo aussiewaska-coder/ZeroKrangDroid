@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Open ZeroKrang in browser (start server first if not running)
-cd ~/ZeroKrangDroid
+cd ~/zerokrang
 
 # Check if server is up
 if curl -s --max-time 2 http://localhost:3001 > /dev/null 2>&1; then

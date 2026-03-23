@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Pull latest from GitHub and restart server
-cd ~/ZeroKrangDroid
+cd ~/zerokrang
 
 termux-notification --title "ZeroKrang" --content "Pulling from GitHub..." --id 1002 2>/dev/null
 

@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Run this ONCE on the phone to install all widget shortcuts
-# Usage: bash ~/ZeroKrangDroid/termux-shortcuts/setup.sh
+# Usage: bash ~/zerokrang/termux-shortcuts/setup.sh
 
 echo "Installing ZeroKrang Termux shortcuts..."
 
@@ -8,7 +8,7 @@ SHORTCUTS=~/.shortcuts
 mkdir -p "$SHORTCUTS"
 
 # Copy all scripts (excluding this setup file)
-for f in ~/ZeroKrangDroid/termux-shortcuts/*; do
+for f in ~/zerokrang/termux-shortcuts/*; do
   name=$(basename "$f")
   [ "$name" = "setup.sh" ] && continue
   cp "$f" "$SHORTCUTS/$name"
@@ -22,4 +22,4 @@ echo "Add each button. Then tap to use."
 echo ""
 echo "Also make sure git is configured:"
 echo "  git config --global credential.helper store"
-echo "  cd ~/ZeroKrangDroid && git pull  (enter token once, it'll be saved)"
+echo "  cd ~/zerokrang && git pull  (enter token once, it'll be saved)"

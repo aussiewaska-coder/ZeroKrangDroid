@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Start ZeroKrang server with pm2 (or node if pm2 not available)
-cd ~/ZeroKrangDroid
+cd ~/zerokrang
 
 if command -v pm2 &>/dev/null; then
   pm2 describe zerokrang &>/dev/null && pm2 restart zerokrang || pm2 start server.js --name zerokrang
